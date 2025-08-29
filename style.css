@@ -1,0 +1,23 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: sans-serif; line-height: 1.5; }
+
+/* TODO: Tambahkan warna dasar */
+body {
+  background: #f6f7fb; /* ganti sesuai selera */
+  color: #222;
+}
+
+/* TODO: Styling untuk header/navbar */
+header { padding: 1rem; text-align: center; }
+
+/* TODO: Styling hero section */
+#hero { padding: 2rem; text-align: center; }
+
+/* TODO: Styling fitur */
+#features { padding: 2rem; display: grid; gap: 1rem; }
+
+/* TODO: Styling CTA */
+#cta { padding: 2rem; text-align: center; }
+
+/* TODO: Styling footer */
+footer { padding: 1rem; text-align: center; font-size: 0.875rem; }
