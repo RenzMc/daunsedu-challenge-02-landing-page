@@ -207,14 +207,30 @@ const BigBangIntro: React.FC<BigBangIntroProps> = ({ onComplete, publicVideoPath
           animation: star-orbit 8s linear infinite;
         }
 
-        .video-fullscreen {
+        .video-container {
           position: fixed;
           top: 0;
           left: 0;
           width: 100vw;
           height: 100vh;
+          z-index: 10;
+          background: black;
+        }
+
+        .video-fullscreen {
+          width: 100%;
+          height: 100%;
           object-fit: cover;
-          z-index: 40;
+        }
+
+        .text-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          z-index: 20;
+          pointer-events: none;
         }
       `}</style>
 
@@ -300,18 +316,24 @@ const BigBangIntro: React.FC<BigBangIntroProps> = ({ onComplete, publicVideoPath
         </div>
       )}
 
-      <video
-        ref={videoRef}
-        className="video-fullscreen"
-        playsInline
-        preload="auto"
-      >
-        <source src={videoSrc} type="video/mp4" />
-        Browser Anda tidak mendukung tag video.
-      </video>
+      {/* Video Container - Z-INDEX 10 */}
+      {hasStarted && (
+        <div className="video-container">
+          <video
+            ref={videoRef}
+            className="video-fullscreen"
+            playsInline
+            preload="auto"
+          >
+            <source src={videoSrc} type="video/mp4" />
+            Browser Anda tidak mendukung tag video.
+          </video>
+        </div>
+      )}
 
+      {/* Loading Overlay - Z-INDEX 30 */}
       {hasStarted && !isPlaying && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-cyan-400 mx-auto mb-4"></div>
             <p className="text-white text-xl cosmic-text">Loading cosmic experience...</p>
@@ -320,8 +342,9 @@ const BigBangIntro: React.FC<BigBangIntroProps> = ({ onComplete, publicVideoPath
         </div>
       )}
 
+      {/* Text Overlay - Z-INDEX 20 (DI ATAS VIDEO) */}
       {stage >= 1 && isPlaying && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center pointer-events-none">
+        <div className="text-overlay flex items-center justify-center">
           <div className="text-center welcome-appear">
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
               <div className="star-orbit">
