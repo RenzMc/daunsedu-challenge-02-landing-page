@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
-    "lint": "eslint .",
+    "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",
+    "lint:fix": "eslint 'src/**/*.{ts,tsx,js,jsx}' --fix",
+    "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,json,css,html}'",
+    "check-format": "prettier --check 'src/**/*.{ts,tsx,js,jsx,json,css,html}'",
     "preview": "vite preview"
   },
   "dependencies": {
