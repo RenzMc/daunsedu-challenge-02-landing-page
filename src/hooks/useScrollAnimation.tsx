@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 
 // Enhanced animation types
-export type AnimationType = 
+export type AnimationType =
   | 'slideFromLeft' | 'slideFromRight' | 'slideFromTop' | 'slideFromBottom'
   | 'fadeIn' | 'scaleIn' | 'scaleOut' | 'rotateIn' | 'flipX' | 'flipY'
   | 'bounceIn' | 'elasticIn' | 'glitch' | 'morphIn' | 'parallax'
   | 'typewriter' | 'wave' | 'magnetic' | 'particle' | 'hologram';
 
-export type EasingFunction = 
+export type EasingFunction =
   | 'linear' | 'easeIn' | 'easeOut' | 'easeInOut' | 'bounce' | 'elastic'
   | 'back' | 'anticipate' | 'overshoot' | 'custom';
 
@@ -50,9 +50,9 @@ export const useScrollAnimation = (options: UseScrollAnimationOptions = {}) => {
     hasTriggered: false,
   });
 
-  const ref = useRef<HTMLDivElement>(null);
-  const animationFrameRef = useRef<number>();
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const ref = useRef<HTMLDivElement | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
     threshold = [0, 0.25, 0.5, 0.75, 1],
@@ -65,6 +65,7 @@ export const useScrollAnimation = (options: UseScrollAnimationOptions = {}) => {
     stagger = 0,
     reverse = false,
     intensity = 1,
+    customEasing,
     onEnter,
     onExit,
     onProgress,
@@ -87,9 +88,9 @@ export const useScrollAnimation = (options: UseScrollAnimationOptions = {}) => {
   }), []);
 
   const getEasing = useCallback(() => {
-    if (options.customEasing) return options.customEasing;
-    return easingFunctions[easing] || easingFunctions.easeOut;
-  }, [easing, easingFunctions, options.customEasing]);
+    if (customEasing) return customEasing;
+    return (easingFunctions as Record<string, string>)[easing] || easingFunctions.easeOut;
+  }, [easing, easingFunctions, customEasing]);
 
   // Enhanced intersection observer
   useEffect(() => {
@@ -144,14 +145,35 @@ export const useScrollAnimation = (options: UseScrollAnimationOptions = {}) => {
     return () => {
       if (ref.current) observer.unobserve(ref.current);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+      if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current);
     };
   }, [threshold, rootMargin, triggerOnce, duration, delay, onEnter, onExit, onProgress]);
 
   return { ref, ...animationState, getEasing };
 };
 
-// Super advanced animation variants
+// Export simple variant objects (useful for Framer Motion or direct imports)
+export const slideFromLeft = {
+  hidden: { opacity: 0, x: -100 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
+};
+
+export const slideFromRight = {
+  hidden: { opacity: 0, x: 100 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
+};
+
+export const slideFromTop = {
+  hidden: { opacity: 0, y: -100 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
+
+export const slideFromBottom = {
+  hidden: { opacity: 0, y: 50 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
+
+// Super advanced animation variants as inline style generator
 export const getAnimationStyle = (
   animationState: AnimationState,
   type: AnimationType,
@@ -178,7 +200,7 @@ export const getAnimationStyle = (
   const { isVisible, progress, intersectionRatio } = animationState;
   const transition = `all ${duration}ms ${easing} ${delay}ms`;
 
-  const baseStyles = {
+  const baseStyles: React.CSSProperties = {
     transition,
     willChange: 'transform, opacity, filter',
   };
@@ -265,16 +287,17 @@ export const getAnimationStyle = (
         transition: `all ${duration}ms cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}ms`,
       };
 
-    case 'glitch':
+    case 'glitch': {
       const glitchOffset = isVisible ? 0 : glitchIntensity * 10;
       return {
         ...baseStyles,
-        transform: `translateX(${Math.random() * glitchOffset - glitchOffset/2}px) 
-                   translateY(${Math.random() * glitchOffset - glitchOffset/2}px)`,
+        transform: `translateX(${Math.random() * glitchOffset - glitchOffset / 2}px) 
+                   translateY(${Math.random() * glitchOffset - glitchOffset / 2}px)`,
         opacity: isVisible ? 1 : 0,
         filter: isVisible ? 'none' : `hue-rotate(${Math.random() * 360}deg) saturate(${2 + Math.random()})`,
         textShadow: isVisible ? 'none' : `${glitchOffset}px 0 red, -${glitchOffset}px 0 blue`,
       };
+    }
 
     case 'morphIn':
       return {
@@ -284,21 +307,23 @@ export const getAnimationStyle = (
         borderRadius: isVisible ? '0%' : '50%',
       };
 
-    case 'parallax':
+    case 'parallax': {
       const parallaxY = (1 - intersectionRatio) * 100 * parallaxSpeed;
       return {
         ...baseStyles,
         transform: `translateY(${parallaxY}px)`,
         opacity: isVisible ? 1 : 0,
       };
+    }
 
-    case 'wave':
+    case 'wave': {
       const waveOffset = Math.sin(Date.now() * 0.005) * 10 * intensity;
       return {
         ...baseStyles,
         transform: `translateY(${isVisible ? waveOffset : 50}px) rotate(${isVisible ? waveOffset * 0.5 : 0}deg)`,
         opacity: isVisible ? 1 : 0,
       };
+    }
 
     case 'magnetic':
       return {
@@ -319,7 +344,7 @@ export const getAnimationStyle = (
         boxShadow: isVisible ? 'none' : '0 0 20px rgba(0,255,255,0.3)',
       };
 
-    case 'particle':
+    case 'particle': {
       const particleScale = isVisible ? 1 : 0.1;
       const particleRotate = isVisible ? 0 : 360 * intensity;
       return {
@@ -328,6 +353,7 @@ export const getAnimationStyle = (
         opacity: isVisible ? 1 : 0,
         filter: `blur(${isVisible ? 0 : 3}px) brightness(${isVisible ? 1 : 2})`,
       };
+    }
 
     case 'typewriter':
       return {
