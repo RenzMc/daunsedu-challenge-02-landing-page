@@ -1,5 +1,9 @@
 import { Youtube, Music, Github, Phone, ExternalLink, MessageCircle } from "lucide-react";
 import { useScrollAnimation, slideFromBottom, slideFromLeft, slideFromRight, scaleIn } from "@/hooks/useScrollAnimation";
+import galaxyCard1 from "@/assets/galaxy-card-1.png";
+import galaxyCard2 from "@/assets/galaxy-card-2.png";
+import galaxyCard3 from "@/assets/galaxy-card-3.png";
+import galaxyCard4 from "@/assets/galaxy-card-4.png";
 
 const ConnectSection = () => {
   const { ref: connectRef, isVisible: connectVisible } = useScrollAnimation({ threshold: 0.3 });
@@ -10,40 +14,40 @@ const ConnectSection = () => {
       handle: "@Renz-Mc",
       url: "https://www.youtube.com/@Renz-Mc",
       icon: Youtube,
-      color: "from-red-500 to-red-600",
+      color: "from-red-500/80 to-red-600/80",
       hoverColor: "hover:shadow-red-500/50",
       description: "Tech tutorials, behind-the-scenes content, and creative projects",
-      galaxyBg: "/assets/galaxy-card-1.png"
+      galaxyBg: galaxyCard1
     },
     {
       name: "TikTok",
       handle: "@fsociety_rl",
       url: "https://www.tiktok.com/@fsociety_rl",
       icon: Music,
-      color: "from-pink-500 to-pink-600",
+      color: "from-pink-500/80 to-pink-600/80",
       hoverColor: "hover:shadow-pink-500/50",
       description: "Quick tips, trending content, and fun tech moments",
-      galaxyBg: "/assets/galaxy-card-2.png"
+      galaxyBg: galaxyCard2
     },
     {
       name: "GitHub",
       handle: "RenzMc",
       url: "https://github.com/RenzMc/",
       icon: Github,
-      color: "from-purple-500 to-purple-600",
+      color: "from-purple-500/80 to-purple-600/80",
       hoverColor: "hover:shadow-purple-500/50",
       description: "Open source projects, code repositories, and collaborations",
-      galaxyBg: "/assets/galaxy-card-3.png"
+      galaxyBg: galaxyCard3
     },
     {
       name: "WhatsApp",
       handle: "082318222611",
       url: "https://wa.me/082318222611",
       icon: Phone,
-      color: "from-green-500 to-green-600",
+      color: "from-green-500/80 to-green-600/80",
       hoverColor: "hover:shadow-green-500/50",
       description: "Direct messaging for collaborations and inquiries",
-      galaxyBg: "/assets/galaxy-card-4.png"
+      galaxyBg: galaxyCard4
     }
   ];
 
@@ -95,36 +99,23 @@ const ConnectSection = () => {
                 href={platform.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`group relative bg-card/40 backdrop-blur-lg rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-2xl ${platform.hoverColor} hover:scale-105 overflow-hidden`}
-                style={scaleIn(connectVisible, 400 + index * 100)}
+                className={`group relative rounded-2xl border border-white/20 hover:border-primary/50 transition-all duration-300 hover:shadow-2xl ${platform.hoverColor} hover:scale-105 overflow-hidden`}
+                style={{
+                  ...scaleIn(connectVisible, 400 + index * 100),
+                  backgroundImage: `url(${platform.galaxyBg})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
+                }}
               >
-                {/* Galaxy Background */}
-                <div 
-                  className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-300"
-                  style={{
-                    backgroundImage: `url(${platform.galaxyBg})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat'
-                  }}
-                />
+                {/* Dark overlay untuk readability */}
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors duration-300" />
                 
-                {/* Overlay untuk memastikan readability */}
-                <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/40" />
+                {/* Gradient overlay untuk efek yang lebih bagus */}
+                <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/60" />
 
                 {/* Platform Header */}
                 <div className={`relative h-24 bg-gradient-to-br ${platform.color} overflow-hidden flex items-center justify-center`}>
-                  {/* Galaxy background untuk header juga */}
-                  <div 
-                    className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300"
-                    style={{
-                      backgroundImage: `url(${platform.galaxyBg})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      backgroundRepeat: 'no-repeat'
-                    }}
-                  />
-                  
                   <IconComponent className="relative z-10 w-8 h-8 text-white group-hover:scale-110 transition-transform duration-300 drop-shadow-lg" />
                   
                   {/* Floating particles */}
@@ -132,7 +123,7 @@ const ConnectSection = () => {
                     {[...Array(6)].map((_, i) => (
                       <div
                         key={i}
-                        className="absolute w-1 h-1 bg-white/30 rounded-full animate-cosmic-drift"
+                        className="absolute w-1 h-1 bg-white/40 rounded-full animate-cosmic-drift"
                         style={{
                           top: `${Math.random() * 100}%`,
                           left: `-5px`,
@@ -147,24 +138,29 @@ const ConnectSection = () => {
                 {/* Platform Content */}
                 <div className="relative p-4 z-10">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-bold text-card-foreground group-hover:text-primary transition-colors drop-shadow-sm">
+                    <h3 className="text-lg font-bold text-white group-hover:text-primary transition-colors drop-shadow-lg">
                       {platform.name}
                     </h3>
-                    <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300" />
+                    <ExternalLink className="w-4 h-4 text-white/80 group-hover:text-primary group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300" />
                   </div>
                   
-                  <p className="text-sm text-primary font-medium mb-2 drop-shadow-sm">
+                  <p className="text-sm text-primary font-medium mb-2 drop-shadow-lg">
                     {platform.handle}
                   </p>
                   
-                  <p className="text-xs text-card-foreground/80 leading-relaxed drop-shadow-sm">
+                  <p className="text-xs text-white/90 leading-relaxed drop-shadow-lg">
                     {platform.description}
                   </p>
                 </div>
 
-                {/* Subtle glow effect */}
+                {/* Glow effect saat hover */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${platform.color} opacity-5 rounded-2xl`} />
+                  <div className={`absolute inset-0 bg-gradient-to-br ${platform.color} opacity-20 rounded-2xl`} />
+                </div>
+
+                {/* Shimmer effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 animate-shimmer" />
                 </div>
               </a>
             );
@@ -173,26 +169,27 @@ const ConnectSection = () => {
 
         {/* Call to Action */}
         <div className="text-center" style={slideFromBottom(connectVisible, 1000)}>
-          <div className="relative bg-gradient-to-r from-primary/10 to-accent/10 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-primary/20 max-w-2xl mx-auto overflow-hidden">
-            {/* Galaxy background untuk CTA */}
-            <div 
-              className="absolute inset-0 opacity-10"
-              style={{
-                backgroundImage: `url(/assets/galaxy-card-1.png)`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-              }}
-            />
+          <div 
+            className="relative backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-white/20 max-w-2xl mx-auto overflow-hidden"
+            style={{
+              backgroundImage: `url(${galaxyCard1})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          >
+            {/* Dark overlay untuk CTA */}
+            <div className="absolute inset-0 bg-black/50" />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
             
             <div className="relative z-10">
               <div className="flex items-center justify-center space-x-2 mb-4">
                 <MessageCircle className="w-6 h-6 text-primary" />
-                <h3 className="text-xl md:text-2xl font-bold text-primary">
+                <h3 className="text-xl md:text-2xl font-bold text-white drop-shadow-lg">
                   Let's Collaborate
                 </h3>
               </div>
-              <p className="text-foreground/80 mb-6 leading-relaxed">
+              <p className="text-white/90 mb-6 leading-relaxed drop-shadow-lg">
                 Whether you're interested in collaborations, have questions about content creation, 
                 or just want to connect with a fellow digital explorer, I'd love to hear from you!
               </p>
@@ -210,7 +207,7 @@ const ConnectSection = () => {
                   href="https://www.youtube.com/@Renz-Mc"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-2 px-6 py-3 border-2 border-primary/30 text-primary backdrop-blur-lg rounded-xl font-semibold hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 transform hover:scale-105"
+                  className="inline-flex items-center space-x-2 px-6 py-3 border-2 border-white/30 text-white backdrop-blur-lg rounded-xl font-semibold hover:bg-white/10 hover:border-white/50 transition-all duration-300 transform hover:scale-105"
                 >
                   <Youtube className="w-4 h-4" />
                   <span>Subscribe on YouTube</span>
