@@ -12,7 +12,8 @@ const ConnectSection = () => {
       icon: Youtube,
       color: "from-red-500 to-red-600",
       hoverColor: "hover:shadow-red-500/50",
-      description: "Tech tutorials, behind-the-scenes content, and creative projects"
+      description: "Tech tutorials, behind-the-scenes content, and creative projects",
+      galaxyBg: "/assets/galaxy-card-1.png"
     },
     {
       name: "TikTok",
@@ -21,7 +22,8 @@ const ConnectSection = () => {
       icon: Music,
       color: "from-pink-500 to-pink-600",
       hoverColor: "hover:shadow-pink-500/50",
-      description: "Quick tips, trending content, and fun tech moments"
+      description: "Quick tips, trending content, and fun tech moments",
+      galaxyBg: "/assets/galaxy-card-2.png"
     },
     {
       name: "GitHub",
@@ -30,7 +32,8 @@ const ConnectSection = () => {
       icon: Github,
       color: "from-purple-500 to-purple-600",
       hoverColor: "hover:shadow-purple-500/50",
-      description: "Open source projects, code repositories, and collaborations"
+      description: "Open source projects, code repositories, and collaborations",
+      galaxyBg: "/assets/galaxy-card-3.png"
     },
     {
       name: "WhatsApp",
@@ -39,7 +42,8 @@ const ConnectSection = () => {
       icon: Phone,
       color: "from-green-500 to-green-600",
       hoverColor: "hover:shadow-green-500/50",
-      description: "Direct messaging for collaborations and inquiries"
+      description: "Direct messaging for collaborations and inquiries",
+      galaxyBg: "/assets/galaxy-card-4.png"
     }
   ];
 
@@ -91,12 +95,37 @@ const ConnectSection = () => {
                 href={platform.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`group bg-card/40 backdrop-blur-lg rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-2xl ${platform.hoverColor} hover:scale-105 overflow-hidden`}
+                className={`group relative bg-card/40 backdrop-blur-lg rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-2xl ${platform.hoverColor} hover:scale-105 overflow-hidden`}
                 style={scaleIn(connectVisible, 400 + index * 100)}
               >
+                {/* Galaxy Background */}
+                <div 
+                  className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-300"
+                  style={{
+                    backgroundImage: `url(${platform.galaxyBg})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                  }}
+                />
+                
+                {/* Overlay untuk memastikan readability */}
+                <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/40" />
+
                 {/* Platform Header */}
-                <div className={`h-24 bg-gradient-to-br ${platform.color} relative overflow-hidden flex items-center justify-center`}>
-                  <IconComponent className="w-8 h-8 text-white group-hover:scale-110 transition-transform duration-300" />
+                <div className={`relative h-24 bg-gradient-to-br ${platform.color} overflow-hidden flex items-center justify-center`}>
+                  {/* Galaxy background untuk header juga */}
+                  <div 
+                    className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300"
+                    style={{
+                      backgroundImage: `url(${platform.galaxyBg})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat'
+                    }}
+                  />
+                  
+                  <IconComponent className="relative z-10 w-8 h-8 text-white group-hover:scale-110 transition-transform duration-300 drop-shadow-lg" />
                   
                   {/* Floating particles */}
                   <div className="absolute inset-0 overflow-hidden">
@@ -116,21 +145,26 @@ const ConnectSection = () => {
                 </div>
 
                 {/* Platform Content */}
-                <div className="p-4">
+                <div className="relative p-4 z-10">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-bold text-card-foreground group-hover:text-primary transition-colors">
+                    <h3 className="text-lg font-bold text-card-foreground group-hover:text-primary transition-colors drop-shadow-sm">
                       {platform.name}
                     </h3>
                     <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300" />
                   </div>
                   
-                  <p className="text-sm text-primary font-medium mb-2">
+                  <p className="text-sm text-primary font-medium mb-2 drop-shadow-sm">
                     {platform.handle}
                   </p>
                   
-                  <p className="text-xs text-card-foreground/70 leading-relaxed">
+                  <p className="text-xs text-card-foreground/80 leading-relaxed drop-shadow-sm">
                     {platform.description}
                   </p>
+                </div>
+
+                {/* Subtle glow effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${platform.color} opacity-5 rounded-2xl`} />
                 </div>
               </a>
             );
@@ -139,36 +173,49 @@ const ConnectSection = () => {
 
         {/* Call to Action */}
         <div className="text-center" style={slideFromBottom(connectVisible, 1000)}>
-          <div className="bg-gradient-to-r from-primary/10 to-accent/10 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-primary/20 max-w-2xl mx-auto">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <MessageCircle className="w-6 h-6 text-primary" />
-              <h3 className="text-xl md:text-2xl font-bold text-primary">
-                Let's Collaborate
-              </h3>
-            </div>
-            <p className="text-foreground/80 mb-6 leading-relaxed">
-              Whether you're interested in collaborations, have questions about content creation, 
-              or just want to connect with a fellow digital explorer, I'd love to hear from you!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="https://wa.me/082318222611"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-green-500/50 transition-all duration-300 transform hover:scale-105"
-              >
-                <Phone className="w-4 h-4" />
-                <span>Message on WhatsApp</span>
-              </a>
-              <a
-                href="https://www.youtube.com/@Renz-Mc"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center space-x-2 px-6 py-3 border-2 border-primary/30 text-primary backdrop-blur-lg rounded-xl font-semibold hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 transform hover:scale-105"
-              >
-                <Youtube className="w-4 h-4" />
-                <span>Subscribe on YouTube</span>
-              </a>
+          <div className="relative bg-gradient-to-r from-primary/10 to-accent/10 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-primary/20 max-w-2xl mx-auto overflow-hidden">
+            {/* Galaxy background untuk CTA */}
+            <div 
+              className="absolute inset-0 opacity-10"
+              style={{
+                backgroundImage: `url(/assets/galaxy-card-1.png)`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
+            />
+            
+            <div className="relative z-10">
+              <div className="flex items-center justify-center space-x-2 mb-4">
+                <MessageCircle className="w-6 h-6 text-primary" />
+                <h3 className="text-xl md:text-2xl font-bold text-primary">
+                  Let's Collaborate
+                </h3>
+              </div>
+              <p className="text-foreground/80 mb-6 leading-relaxed">
+                Whether you're interested in collaborations, have questions about content creation, 
+                or just want to connect with a fellow digital explorer, I'd love to hear from you!
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="https://wa.me/082318222611"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-green-500/50 transition-all duration-300 transform hover:scale-105"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span>Message on WhatsApp</span>
+                </a>
+                <a
+                  href="https://www.youtube.com/@Renz-Mc"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center space-x-2 px-6 py-3 border-2 border-primary/30 text-primary backdrop-blur-lg rounded-xl font-semibold hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 transform hover:scale-105"
+                >
+                  <Youtube className="w-4 h-4" />
+                  <span>Subscribe on YouTube</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
