@@ -1,139 +1,34 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-
-// Enhanced animation types
-export type AnimationType =
-  | 'slideFromLeft' | 'slideFromRight' | 'slideFromTop' | 'slideFromBottom'
-  | 'fadeIn' | 'scaleIn' | 'scaleOut' | 'rotateIn' | 'flipX' | 'flipY'
-  | 'bounceIn' | 'elasticIn' | 'glitch' | 'morphIn' | 'parallax'
-  | 'typewriter' | 'wave' | 'magnetic' | 'particle' | 'hologram';
-
-export type EasingFunction =
-  | 'linear' | 'easeIn' | 'easeOut' | 'easeInOut' | 'bounce' | 'elastic'
-  | 'back' | 'anticipate' | 'overshoot' | 'custom';
+import { useEffect, useRef, useState } from 'react';
 
 interface UseScrollAnimationOptions {
-  threshold?: number | number[];
+  threshold?: number;
   rootMargin?: string;
   triggerOnce?: boolean;
-  animationType?: AnimationType;
-  duration?: number;
-  delay?: number;
-  easing?: EasingFunction;
-  stagger?: number;
-  reverse?: boolean;
-  intensity?: number;
-  customEasing?: string;
-  onEnter?: () => void;
-  onExit?: () => void;
-  onProgress?: (progress: number) => void;
-  parallaxSpeed?: number;
-  magneticStrength?: number;
-  glitchIntensity?: number;
-}
-
-interface AnimationState {
-  isVisible: boolean;
-  progress: number;
-  intersectionRatio: number;
-  isEntering: boolean;
-  isExiting: boolean;
-  hasTriggered: boolean;
+  staggerChildren?: number;
 }
 
 export const useScrollAnimation = (options: UseScrollAnimationOptions = {}) => {
-  const [animationState, setAnimationState] = useState<AnimationState>({
-    isVisible: false,
-    progress: 0,
-    intersectionRatio: 0,
-    isEntering: false,
-    isExiting: false,
-    hasTriggered: false,
-  });
+  const [isVisible, setIsVisible] = useState(false);
+  const [animationProgress, setAnimationProgress] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const ref = useRef<HTMLDivElement | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { threshold = 0.1, rootMargin = '0px', triggerOnce = true } = options;
 
-  const {
-    threshold = [0, 0.25, 0.5, 0.75, 1],
-    rootMargin = '0px',
-    triggerOnce = true,
-    animationType = 'fadeIn',
-    duration = 600,
-    delay = 0,
-    easing = 'easeOut',
-    stagger = 0,
-    reverse = false,
-    intensity = 1,
-    customEasing,
-    onEnter,
-    onExit,
-    onProgress,
-    parallaxSpeed = 0.5,
-    magneticStrength = 0.3,
-    glitchIntensity = 0.1,
-  } = options;
-
-  // Easing functions
-  const easingFunctions = useMemo(() => ({
-    linear: 'linear',
-    easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
-    easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
-    easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
-    bounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-    elastic: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-    back: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-    anticipate: 'cubic-bezier(0.175, 0.885, 0.32, 1.8)',
-    overshoot: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-  }), []);
-
-  const getEasing = useCallback(() => {
-    if (customEasing) return customEasing;
-    return (easingFunctions as Record<string, string>)[easing] || easingFunctions.easeOut;
-  }, [easing, easingFunctions, customEasing]);
-
-  // Enhanced intersection observer
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const ratio = entry.intersectionRatio;
-          const isIntersecting = entry.isIntersecting;
-
-          setAnimationState(prev => {
-            const newState = {
-              ...prev,
-              intersectionRatio: ratio,
-              progress: ratio,
-            };
-
-            if (isIntersecting && !prev.isVisible) {
-              newState.isVisible = true;
-              newState.isEntering = true;
-              newState.isExiting = false;
-              newState.hasTriggered = true;
-              onEnter?.();
-            } else if (!isIntersecting && prev.isVisible && !triggerOnce) {
-              newState.isVisible = false;
-              newState.isEntering = false;
-              newState.isExiting = true;
-              onExit?.();
-            }
-
-            onProgress?.(ratio);
-            return newState;
-          });
-
-          // Reset entering/exiting states after animation
-          if (timeoutRef.current) clearTimeout(timeoutRef.current);
-          timeoutRef.current = setTimeout(() => {
-            setAnimationState(prev => ({
-              ...prev,
-              isEntering: false,
-              isExiting: false,
-            }));
-          }, duration + delay);
-        });
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          // Calculate animation progress based on intersection ratio
+          setAnimationProgress(entry.intersectionRatio);
+          
+          if (triggerOnce && ref.current) {
+            observer.unobserve(ref.current);
+          }
+        } else if (!triggerOnce) {
+          setIsVisible(false);
+          setAnimationProgress(0);
+        }
       },
       { threshold, rootMargin }
     );
@@ -143,305 +38,131 @@ export const useScrollAnimation = (options: UseScrollAnimationOptions = {}) => {
     }
 
     return () => {
-      if (ref.current) observer.unobserve(ref.current);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current);
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
     };
-  }, [threshold, rootMargin, triggerOnce, duration, delay, onEnter, onExit, onProgress]);
+  }, [threshold, rootMargin, triggerOnce]);
 
-  return { ref, ...animationState, getEasing };
+  return { ref, isVisible, animationProgress };
 };
 
-// Export simple variant objects (useful for Framer Motion or direct imports)
-export const slideFromLeft = {
-  hidden: { opacity: 0, x: -100 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
-};
+// Enhanced animation variants with more complex effects
+export const slideFromLeft = (isVisible: boolean, delay = 0) => ({
+  transform: isVisible 
+    ? 'translateX(0) rotateY(0deg)' 
+    : 'translateX(-120px) rotateY(-15deg)',
+  opacity: isVisible ? 1 : 0,
+  filter: isVisible ? 'blur(0px) brightness(1)' : 'blur(8px) brightness(0.7)',
+  transition: `all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}ms`,
+  transformOrigin: 'left center',
+});
 
-export const slideFromRight = {
-  hidden: { opacity: 0, x: 100 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
-};
+export const slideFromRight = (isVisible: boolean, delay = 0) => ({
+  transform: isVisible 
+    ? 'translateX(0) rotateY(0deg)' 
+    : 'translateX(120px) rotateY(15deg)',
+  opacity: isVisible ? 1 : 0,
+  filter: isVisible ? 'blur(0px) brightness(1)' : 'blur(8px) brightness(0.7)',
+  transition: `all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}ms`,
+  transformOrigin: 'right center',
+});
 
-export const slideFromTop = {
-  hidden: { opacity: 0, y: -100 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-};
+export const slideFromBottom = (isVisible: boolean, delay = 0) => ({
+  transform: isVisible 
+    ? 'translateY(0) rotateX(0deg) scale(1)' 
+    : 'translateY(80px) rotateX(25deg) scale(0.95)',
+  opacity: isVisible ? 1 : 0,
+  filter: isVisible ? 'blur(0px) saturate(1)' : 'blur(6px) saturate(0.8)',
+  boxShadow: isVisible 
+    ? '0 20px 40px rgba(0,0,0,0.1)' 
+    : '0 5px 15px rgba(0,0,0,0.05)',
+  transition: `all 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}ms`,
+  transformOrigin: 'bottom center',
+});
 
-export const slideFromBottom = {
-  hidden: { opacity: 0, y: 50 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-};
+export const fadeIn = (isVisible: boolean, delay = 0) => ({
+  opacity: isVisible ? 1 : 0,
+  filter: isVisible 
+    ? 'blur(0px) contrast(1) saturate(1)' 
+    : 'blur(10px) contrast(0.8) saturate(0.5)',
+  transform: isVisible ? 'scale(1)' : 'scale(1.05)',
+  transition: `all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${delay}ms`,
+});
 
-// Super advanced animation variants as inline style generator
-export const getAnimationStyle = (
-  animationState: AnimationState,
-  type: AnimationType,
-  options: {
-    duration?: number;
-    delay?: number;
-    intensity?: number;
-    easing?: string;
-    parallaxSpeed?: number;
-    magneticStrength?: number;
-    glitchIntensity?: number;
-  } = {}
+export const scaleIn = (isVisible: boolean, delay = 0) => ({
+  transform: isVisible 
+    ? 'scale(1) rotate(0deg)' 
+    : 'scale(0.7) rotate(-5deg)',
+  opacity: isVisible ? 1 : 0,
+  filter: isVisible 
+    ? 'blur(0px) brightness(1) contrast(1)' 
+    : 'blur(12px) brightness(0.6) contrast(0.8)',
+  boxShadow: isVisible 
+    ? '0 25px 50px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1)' 
+    : '0 5px 15px rgba(0,0,0,0.05)',
+  transition: `all 0.9s cubic-bezier(0.68, -0.55, 0.265, 1.55) ${delay}ms`,
+  transformOrigin: 'center center',
+});
+
+// Bonus: Advanced animation variants
+export const slideFromTop = (isVisible: boolean, delay = 0) => ({
+  transform: isVisible 
+    ? 'translateY(0) rotateX(0deg) perspective(1000px)' 
+    : 'translateY(-80px) rotateX(-25deg) perspective(1000px)',
+  opacity: isVisible ? 1 : 0,
+  filter: isVisible ? 'blur(0px) hue-rotate(0deg)' : 'blur(6px) hue-rotate(10deg)',
+  transition: `all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}ms`,
+  transformOrigin: 'top center',
+});
+
+export const flipIn = (isVisible: boolean, delay = 0) => ({
+  transform: isVisible 
+    ? 'rotateY(0deg) scale(1)' 
+    : 'rotateY(90deg) scale(0.8)',
+  opacity: isVisible ? 1 : 0,
+  filter: isVisible ? 'blur(0px)' : 'blur(4px)',
+  transition: `all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}ms`,
+  transformOrigin: 'center center',
+  transformStyle: 'preserve-3d' as const,
+});
+
+export const bounceIn = (isVisible: boolean, delay = 0) => ({
+  transform: isVisible ? 'scale(1)' : 'scale(0.3)',
+  opacity: isVisible ? 1 : 0,
+  filter: isVisible ? 'blur(0px)' : 'blur(8px)',
+  transition: `all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) ${delay}ms`,
+});
+
+export const slideRotateIn = (isVisible: boolean, delay = 0) => ({
+  transform: isVisible 
+    ? 'translateX(0) rotate(0deg) scale(1)' 
+    : 'translateX(-100px) rotate(-180deg) scale(0.5)',
+  opacity: isVisible ? 1 : 0,
+  filter: isVisible ? 'blur(0px) hue-rotate(0deg)' : 'blur(10px) hue-rotate(45deg)',
+  transition: `all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}ms`,
+  transformOrigin: 'center center',
+});
+
+// Utility function for staggered animations
+export const createStaggeredAnimation = (
+  animationFn: (isVisible: boolean, delay: number) => any,
+  isVisible: boolean,
+  index: number,
+  staggerDelay = 100
 ) => {
-  const {
-    duration = 600,
-    delay = 0,
-    intensity = 1,
-    easing = 'cubic-bezier(0, 0, 0.2, 1)',
-    parallaxSpeed = 0.5,
-    magneticStrength = 0.3,
-    glitchIntensity = 0.1,
-  } = options;
-
-  const { isVisible, progress, intersectionRatio } = animationState;
-  const transition = `all ${duration}ms ${easing} ${delay}ms`;
-
-  const baseStyles: React.CSSProperties = {
-    transition,
-    willChange: 'transform, opacity, filter',
-  };
-
-  switch (type) {
-    case 'slideFromLeft':
-      return {
-        ...baseStyles,
-        transform: `translateX(${isVisible ? 0 : -100 * intensity}px)`,
-        opacity: isVisible ? 1 : 0,
-      };
-
-    case 'slideFromRight':
-      return {
-        ...baseStyles,
-        transform: `translateX(${isVisible ? 0 : 100 * intensity}px)`,
-        opacity: isVisible ? 1 : 0,
-      };
-
-    case 'slideFromTop':
-      return {
-        ...baseStyles,
-        transform: `translateY(${isVisible ? 0 : -100 * intensity}px)`,
-        opacity: isVisible ? 1 : 0,
-      };
-
-    case 'slideFromBottom':
-      return {
-        ...baseStyles,
-        transform: `translateY(${isVisible ? 0 : 50 * intensity}px)`,
-        opacity: isVisible ? 1 : 0,
-      };
-
-    case 'scaleIn':
-      return {
-        ...baseStyles,
-        transform: `scale(${isVisible ? 1 : 0.8 * intensity})`,
-        opacity: isVisible ? 1 : 0,
-      };
-
-    case 'scaleOut':
-      return {
-        ...baseStyles,
-        transform: `scale(${isVisible ? 1 : 1.2 * intensity})`,
-        opacity: isVisible ? 1 : 0,
-      };
-
-    case 'rotateIn':
-      return {
-        ...baseStyles,
-        transform: `rotate(${isVisible ? 0 : -180 * intensity}deg) scale(${isVisible ? 1 : 0.8})`,
-        opacity: isVisible ? 1 : 0,
-      };
-
-    case 'flipX':
-      return {
-        ...baseStyles,
-        transform: `rotateX(${isVisible ? 0 : -90 * intensity}deg)`,
-        opacity: isVisible ? 1 : 0,
-        transformOrigin: 'center bottom',
-      };
-
-    case 'flipY':
-      return {
-        ...baseStyles,
-        transform: `rotateY(${isVisible ? 0 : -90 * intensity}deg)`,
-        opacity: isVisible ? 1 : 0,
-        transformOrigin: 'center center',
-      };
-
-    case 'bounceIn':
-      return {
-        ...baseStyles,
-        transform: `scale(${isVisible ? 1 : 0.3}) translateY(${isVisible ? 0 : 50 * intensity}px)`,
-        opacity: isVisible ? 1 : 0,
-        transition: `all ${duration}ms cubic-bezier(0.68, -0.55, 0.265, 1.55) ${delay}ms`,
-      };
-
-    case 'elasticIn':
-      return {
-        ...baseStyles,
-        transform: `scale(${isVisible ? 1 : 0.1}) rotate(${isVisible ? 0 : 30 * intensity}deg)`,
-        opacity: isVisible ? 1 : 0,
-        transition: `all ${duration}ms cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}ms`,
-      };
-
-    case 'glitch': {
-      const glitchOffset = isVisible ? 0 : glitchIntensity * 10;
-      return {
-        ...baseStyles,
-        transform: `translateX(${Math.random() * glitchOffset - glitchOffset / 2}px) 
-                   translateY(${Math.random() * glitchOffset - glitchOffset / 2}px)`,
-        opacity: isVisible ? 1 : 0,
-        filter: isVisible ? 'none' : `hue-rotate(${Math.random() * 360}deg) saturate(${2 + Math.random()})`,
-        textShadow: isVisible ? 'none' : `${glitchOffset}px 0 red, -${glitchOffset}px 0 blue`,
-      };
-    }
-
-    case 'morphIn':
-      return {
-        ...baseStyles,
-        transform: `scale(${isVisible ? 1 : 0.5}) skew(${isVisible ? 0 : 15 * intensity}deg)`,
-        opacity: isVisible ? 1 : 0,
-        borderRadius: isVisible ? '0%' : '50%',
-      };
-
-    case 'parallax': {
-      const parallaxY = (1 - intersectionRatio) * 100 * parallaxSpeed;
-      return {
-        ...baseStyles,
-        transform: `translateY(${parallaxY}px)`,
-        opacity: isVisible ? 1 : 0,
-      };
-    }
-
-    case 'wave': {
-      const waveOffset = Math.sin(Date.now() * 0.005) * 10 * intensity;
-      return {
-        ...baseStyles,
-        transform: `translateY(${isVisible ? waveOffset : 50}px) rotate(${isVisible ? waveOffset * 0.5 : 0}deg)`,
-        opacity: isVisible ? 1 : 0,
-      };
-    }
-
-    case 'magnetic':
-      return {
-        ...baseStyles,
-        transform: `scale(${isVisible ? 1 : 0.9}) translateZ(0)`,
-        opacity: isVisible ? 1 : 0,
-        filter: `blur(${isVisible ? 0 : 5 * intensity}px)`,
-        cursor: 'pointer',
-      };
-
-    case 'hologram':
-      return {
-        ...baseStyles,
-        transform: `translateY(${isVisible ? 0 : 30 * intensity}px)`,
-        opacity: isVisible ? 1 : 0,
-        background: isVisible ? 'transparent' : 'linear-gradient(45deg, rgba(0,255,255,0.1), rgba(255,0,255,0.1))',
-        filter: isVisible ? 'none' : 'blur(1px) brightness(1.2)',
-        boxShadow: isVisible ? 'none' : '0 0 20px rgba(0,255,255,0.3)',
-      };
-
-    case 'particle': {
-      const particleScale = isVisible ? 1 : 0.1;
-      const particleRotate = isVisible ? 0 : 360 * intensity;
-      return {
-        ...baseStyles,
-        transform: `scale(${particleScale}) rotate(${particleRotate}deg)`,
-        opacity: isVisible ? 1 : 0,
-        filter: `blur(${isVisible ? 0 : 3}px) brightness(${isVisible ? 1 : 2})`,
-      };
-    }
-
-    case 'typewriter':
-      return {
-        ...baseStyles,
-        opacity: 1,
-        overflow: 'hidden',
-        borderRight: isVisible ? 'none' : '2px solid currentColor',
-        whiteSpace: 'nowrap',
-        width: isVisible ? '100%' : '0%',
-        animation: isVisible ? `typewriter ${duration}ms steps(40) ${delay}ms forwards` : 'none',
-      };
-
-    default:
-      return {
-        ...baseStyles,
-        opacity: isVisible ? 1 : 0,
-      };
-  }
+  return animationFn(isVisible, index * staggerDelay);
 };
 
-// Staggered animations for multiple elements
-export const useStaggeredAnimation = (
-  count: number,
-  baseOptions: UseScrollAnimationOptions = {}
-) => {
-  const animations = Array.from({ length: count }, (_, index) => {
-    return useScrollAnimation({
-      ...baseOptions,
-      delay: (baseOptions.delay || 0) + (baseOptions.stagger || 100) * index,
-    });
-  });
-
-  return animations;
-};
-
-// CSS keyframes for complex animations
-export const animationKeyframes = `
-  @keyframes typewriter {
-    from { width: 0% }
-    to { width: 100% }
-  }
-
-  @keyframes glitch {
-    0%, 100% { transform: translate(0) }
-    20% { transform: translate(-2px, 2px) }
-    40% { transform: translate(-2px, -2px) }
-    60% { transform: translate(2px, 2px) }
-    80% { transform: translate(2px, -2px) }
-  }
-
-  @keyframes hologram {
-    0%, 100% { opacity: 1; filter: blur(0px) }
-    50% { opacity: 0.8; filter: blur(1px) }
-  }
-
-  @keyframes particle {
-    0% { transform: scale(0) rotate(0deg); opacity: 0 }
-    50% { transform: scale(1.2) rotate(180deg); opacity: 0.8 }
-    100% { transform: scale(1) rotate(360deg); opacity: 1 }
-  }
-`;
-
-// Utility component for easy usage
-interface AnimatedElementProps {
-  children: React.ReactNode;
-  animation?: AnimationType;
-  className?: string;
-  style?: React.CSSProperties;
-  options?: UseScrollAnimationOptions;
-}
-
-export const AnimatedElement: React.FC<AnimatedElementProps> = ({
-  children,
-  animation = 'fadeIn',
-  className = '',
-  style = {},
-  options = {},
-}) => {
-  const animationState = useScrollAnimation(options);
-  const animationStyle = getAnimationStyle(animationState, animation, options);
-
-  return (
-    <div
-      ref={animationState.ref}
-      className={className}
-      style={{ ...style, ...animationStyle }}
-    >
-      {children}
-    </div>
-  );
-};
+// Advanced parallax-like effect
+export const parallaxSlide = (isVisible: boolean, delay = 0, intensity = 1) => ({
+  transform: isVisible 
+    ? `translateY(0) translateZ(0) scale(1)` 
+    : `translateY(${50 * intensity}px) translateZ(-100px) scale(0.95)`,
+  opacity: isVisible ? 1 : 0,
+  filter: isVisible 
+    ? 'blur(0px) brightness(1)' 
+    : `blur(${4 * intensity}px) brightness(0.8)`,
+  transition: `all ${0.8 + (intensity * 0.2)}s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${delay}ms`,
+  transformStyle: 'preserve-3d' as const,
+});
