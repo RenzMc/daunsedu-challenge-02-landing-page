@@ -1,37 +1,63 @@
-import { useState, useEffect, useRef } from "react";
-import { Sparkles, Star, Zap, Play } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Play, Sparkles, Star, Zap } from "lucide-react";
 import galaxyHero from "@/assets/big-bang.mp4";
 
 interface BigBangIntroProps {
   onComplete: () => void;
+  publicVideoPath?: string;
 }
 
-const BigBangIntro = ({ onComplete }: BigBangIntroProps) => {
+const BigBangIntro: React.FC<BigBangIntroProps> = ({ onComplete, publicVideoPath }) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
-  const [stage, setStage] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [stage, setStage] = useState(0);
+  const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
+
+  const videoSrc = publicVideoPath ? publicVideoPath : (galaxyHero as unknown as string);
 
   const handleStartJourney = async () => {
-    setHasStarted(true);
-    
     const video = videoRef.current;
-    if (video) {
+    if (!video) {
+      setLoadingMessage("Video tidak tersedia.");
+      setTimeout(() => onComplete(), 26000);
+      return;
+    }
+
+    try {
+      video.setAttribute("playsinline", "true");
+      video.setAttribute("webkit-playsinline", "true");
+    } catch (e) {}
+
+    setLoadingMessage("Mempersiapkan video...");
+    setHasStarted(true);
+
+    try {
+      video.muted = true;
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        await playPromise;
+      }
+
       try {
-        video.currentTime = 0;
         video.muted = false;
-        video.volume = 0.7;
-        
-        await video.play();
-        setIsPlaying(true);
-      } catch (error) {
-        try {
+        video.volume = 0.8;
+      } catch (e) {}
+
+      setIsPlaying(true);
+      setLoadingMessage(null);
+    } catch (err) {
+      try {
+        await (async () => {
           video.muted = true;
-          await video.play();
-          setIsPlaying(true);
-        } catch (fallbackError) {
-          setTimeout(() => onComplete(), 26000);
-        }
+          const p = video.play();
+          if (p !== undefined) await p;
+        })();
+        setIsPlaying(true);
+        setLoadingMessage(null);
+      } catch (err2) {
+        setLoadingMessage("Tidak bisa memutar video — lanjut ke tampilan selanjutnya...");
+        setTimeout(() => onComplete(), 26000);
       }
     }
   };
@@ -40,97 +66,159 @@ const BigBangIntro = ({ onComplete }: BigBangIntroProps) => {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleTimeUpdate = () => {
+    const onTimeUpdate = () => {
       if (video.currentTime >= 10 && stage === 0) {
         setStage(1);
       }
     };
 
-    const handleEnded = () => {
+    const onEnded = () => {
       onComplete();
     };
 
-    video.addEventListener('timeupdate', handleTimeUpdate);
-    video.addEventListener('ended', handleEnded);
+    const onError = (ev: any) => {
+      setLoadingMessage("Terjadi error saat memuat video. Cek network/path.");
+    };
+
+    video.addEventListener("timeupdate", onTimeUpdate);
+    video.addEventListener("ended", onEnded);
+    video.addEventListener("error", onError);
 
     return () => {
-      video.removeEventListener('timeupdate', handleTimeUpdate);
-      video.removeEventListener('ended', handleEnded);
+      video.removeEventListener("timeupdate", onTimeUpdate);
+      video.removeEventListener("ended", onEnded);
+      video.removeEventListener("error", onError);
     };
   }, [onComplete, stage]);
 
   useEffect(() => {
     if (hasStarted && isPlaying) {
-      const timer = setTimeout(() => onComplete(), 28000);
-      return () => clearTimeout(timer);
+      const t = setTimeout(() => {
+        onComplete();
+      }, 28000);
+      return () => clearTimeout(t);
     }
   }, [hasStarted, isPlaying, onComplete]);
 
-  if (!hasStarted) {
-    return (
-      <>
-        <style jsx>{`
-          @keyframes galaxy-spin {
-            0% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(180deg) scale(1.05); }
-            100% { transform: rotate(360deg) scale(1); }
-          }
+  return (
+    <>
+      <style jsx>{`
+        @keyframes galaxy-spin {
+          0% { transform: rotate(0deg) scale(1); }
+          50% { transform: rotate(180deg) scale(1.05); }
+          100% { transform: rotate(360deg) scale(1); }
+        }
 
-          @keyframes cosmic-pulse {
-            0%, 100% {
-              box-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(6, 182, 212, 0.3);
-            }
-            50% {
-              box-shadow: 0 0 40px rgba(6, 182, 212, 0.8), 0 0 80px rgba(139, 92, 246, 0.6);
-            }
+        @keyframes cosmic-pulse {
+          0%, 100% {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(6, 182, 212, 0.3);
           }
-
-          @keyframes text-glow {
-            0%, 100% {
-              text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(139, 92, 246, 0.6);
-            }
-            50% {
-              text-shadow: 0 0 20px rgba(6, 182, 212, 1), 0 0 40px rgba(139, 92, 246, 0.8);
-            }
+          50% {
+            box-shadow: 0 0 40px rgba(6, 182, 212, 0.8), 0 0 80px rgba(139, 92, 246, 0.6);
           }
+        }
 
-          @keyframes stars-twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.2); }
+        @keyframes text-glow {
+          0%, 100% {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(139, 92, 246, 0.6);
           }
-
-          @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+          50% {
+            text-shadow: 0 0 20px rgba(6, 182, 212, 1), 0 0 40px rgba(139, 92, 246, 0.8);
           }
+        }
 
-          .galaxy-button {
-            background: radial-gradient(circle at center, 
-              rgba(139, 92, 246, 0.9) 0%, 
-              rgba(6, 182, 212, 0.7) 40%, 
-              rgba(139, 92, 246, 0.5) 70%, 
-              rgba(0, 0, 0, 0.8) 100%);
-            animation: cosmic-pulse 3s ease-in-out infinite;
+        @keyframes stars-twinkle {
+          0%, 100% { opacity: 0.3; transform: scale(0.8); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+
+        @keyframes cosmic-glow {
+          0%, 100% {
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.8), 0 0 40px rgba(6, 182, 212, 0.6);
           }
-
-          .galaxy-button:hover {
-            animation: cosmic-pulse 1.5s ease-in-out infinite;
-            transform: scale(1.05);
+          50% {
+            text-shadow: 0 0 30px rgba(6, 182, 212, 1), 0 0 60px rgba(139, 92, 246, 0.8);
           }
+        }
 
-          .welcome-text {
-            animation: text-glow 2s ease-in-out infinite;
+        @keyframes welcome-appear {
+          0% {
+            opacity: 0;
+            transform: translateY(50px) scale(0.8);
+            filter: blur(10px);
           }
-
-          .floating-stars {
-            animation: stars-twinkle 2s ease-in-out infinite;
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0px);
           }
+        }
 
-          .floating {
-            animation: float 3s ease-in-out infinite;
-          }
-        `}</style>
+        @keyframes star-orbit {
+          0% { transform: rotate(0deg) translateX(80px) rotate(0deg); }
+          100% { transform: rotate(360deg) translateX(80px) rotate(-360deg); }
+        }
 
+        .galaxy-button {
+          background: radial-gradient(circle at center, 
+            rgba(139, 92, 246, 0.9) 0%, 
+            rgba(6, 182, 212, 0.7) 40%, 
+            rgba(139, 92, 246, 0.5) 70%, 
+            rgba(0, 0, 0, 0.8) 100%);
+          animation: cosmic-pulse 3s ease-in-out infinite;
+        }
+
+        .galaxy-button:hover {
+          animation: cosmic-pulse 1.5s ease-in-out infinite;
+          transform: scale(1.05);
+        }
+
+        .welcome-text {
+          animation: text-glow 2s ease-in-out infinite;
+        }
+
+        .floating-stars {
+          animation: stars-twinkle 2s ease-in-out infinite;
+        }
+
+        .floating {
+          animation: float 3s ease-in-out infinite;
+        }
+
+        .cosmic-text {
+          background: linear-gradient(45deg, #06b6d4, #8b5cf6, #ec4899, #06b6d4);
+          background-size: 400% 100%;
+          animation: cosmic-glow 2s ease-in-out infinite;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-appear {
+          animation: welcome-appear 2s ease-out forwards;
+        }
+
+        .star-orbit {
+          animation: star-orbit 8s linear infinite;
+        }
+
+        .video-fullscreen {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          object-fit: cover;
+          z-index: 40;
+        }
+      `}</style>
+
+      {!hasStarted && (
         <div className="fixed inset-0 z-50 bg-gradient-to-br from-black via-purple-900/30 to-black flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             {[...Array(100)].map((_, i) => (
@@ -162,6 +250,7 @@ const BigBangIntro = ({ onComplete }: BigBangIntroProps) => {
             </div>
 
             <button
+              aria-label="Begin Journey"
               onClick={handleStartJourney}
               className="galaxy-button relative w-48 h-48 md:w-56 md:h-56 rounded-full flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 group mb-8"
             >
@@ -203,132 +292,64 @@ const BigBangIntro = ({ onComplete }: BigBangIntroProps) => {
                 <Sparkles className="w-4 h-4 text-cyan-400 floating-stars" style={{ animationDelay: '1.2s' }} />
               </div>
             </div>
-          </div>
 
-          <video
-            ref={videoRef}
-            className="hidden"
-            muted
-            playsInline
-            preload="auto"
-            webkit-playsinline="true"
-          >
-            <source src={galaxyHero} type="video/mp4" />
-          </video>
+            {loadingMessage && (
+              <p className="text-sm text-yellow-300 mt-4 cosmic-text">{loadingMessage}</p>
+            )}
+          </div>
         </div>
-      </>
-    );
-  }
+      )}
 
-  return (
-    <>
-      <style jsx>{`
-        @keyframes cosmic-glow {
-          0%, 100% {
-            text-shadow: 0 0 20px rgba(139, 92, 246, 0.8), 0 0 40px rgba(6, 182, 212, 0.6);
-          }
-          50% {
-            text-shadow: 0 0 30px rgba(6, 182, 212, 1), 0 0 60px rgba(139, 92, 246, 0.8);
-          }
-        }
+      <video
+        ref={videoRef}
+        className="video-fullscreen"
+        playsInline
+        preload="auto"
+      >
+        <source src={videoSrc} type="video/mp4" />
+        Browser Anda tidak mendukung tag video.
+      </video>
 
-        @keyframes welcome-appear {
-          0% {
-            opacity: 0;
-            transform: translateY(50px) scale(0.8);
-            filter: blur(10px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            filter: blur(0px);
-          }
-        }
-
-        @keyframes star-orbit {
-          0% { transform: rotate(0deg) translateX(80px) rotate(0deg); }
-          100% { transform: rotate(360deg) translateX(80px) rotate(-360deg); }
-        }
-
-        .cosmic-text {
-          background: linear-gradient(45deg, #06b6d4, #8b5cf6, #ec4899, #06b6d4);
-          background-size: 400% 100%;
-          animation: cosmic-glow 2s ease-in-out infinite;
-          -webkit-background-clip: text;
-          background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-
-        .welcome-appear {
-          animation: welcome-appear 2s ease-out forwards;
-        }
-
-        .star-orbit {
-          animation: star-orbit 8s linear infinite;
-        }
-
-        .video-fullscreen {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          object-fit: cover;
-          z-index: 1;
-        }
-      `}</style>
-
-      <div className="fixed inset-0 z-50 bg-black">
-        <video
-          ref={videoRef}
-          className="video-fullscreen"
-          playsInline
-          webkit-playsinline="true"
-          autoPlay={false}
-        >
-          <source src={galaxyHero} type="video/mp4" />
-        </video>
-
-        {!isPlaying && (
-          <div className="absolute inset-0 bg-black flex items-center justify-center z-10">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-cyan-400 mx-auto mb-4"></div>
-              <p className="text-white text-xl cosmic-text">Loading cosmic experience...</p>
-            </div>
+      {hasStarted && !isPlaying && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+            <p className="text-white text-xl cosmic-text">Loading cosmic experience...</p>
+            {loadingMessage && <p className="text-white/70 text-sm mt-2">{loadingMessage}</p>}
           </div>
-        )}
+        </div>
+      )}
 
-        {stage >= 1 && isPlaying && (
-          <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/20">
-            <div className="text-center welcome-appear">
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                <div className="star-orbit">
-                  <Star className="w-6 h-6 text-cyan-400" />
-                </div>
-                <div className="star-orbit" style={{ animationDelay: '-2s', animationDuration: '6s' }}>
-                  <Sparkles className="w-5 h-5 text-purple-400" />
-                </div>
-                <div className="star-orbit" style={{ animationDelay: '-4s', animationDuration: '10s' }}>
-                  <Zap className="w-6 h-6 text-pink-400" />
-                </div>
+      {stage >= 1 && isPlaying && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center pointer-events-none">
+          <div className="text-center welcome-appear">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+              <div className="star-orbit">
+                <Star className="w-6 h-6 text-cyan-400" />
               </div>
-
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 drop-shadow-2xl cosmic-text">
-                Welcome to RenzMc's Galaxy
-              </h1>
-              <p className="text-xl md:text-3xl text-white/95 drop-shadow-lg cosmic-text font-light">
-                Witness the birth of the universe...
-              </p>
-              
-              <div className="flex justify-center space-x-6 mt-8">
-                <Star className="w-6 h-6 text-cyan-400 animate-pulse" />
-                <Sparkles className="w-7 h-7 text-purple-400 animate-pulse" style={{ animationDelay: '0.3s' }} />
-                <Zap className="w-6 h-6 text-pink-400 animate-pulse" style={{ animationDelay: '0.6s' }} />
+              <div className="star-orbit" style={{ animationDelay: '-2s', animationDuration: '6s' }}>
+                <Sparkles className="w-5 h-5 text-purple-400" />
+              </div>
+              <div className="star-orbit" style={{ animationDelay: '-4s', animationDuration: '10s' }}>
+                <Zap className="w-6 h-6 text-pink-400" />
               </div>
             </div>
+
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 drop-shadow-2xl cosmic-text">
+              Welcome to RenzMc's Galaxy
+            </h1>
+            <p className="text-xl md:text-3xl text-white/95 drop-shadow-lg cosmic-text font-light">
+              Witness the birth of the universe...
+            </p>
+            
+            <div className="flex justify-center space-x-6 mt-8">
+              <Star className="w-6 h-6 text-cyan-400 animate-pulse" />
+              <Sparkles className="w-7 h-7 text-purple-400 animate-pulse" style={{ animationDelay: '0.3s' }} />
+              <Zap className="w-6 h-6 text-pink-400 animate-pulse" style={{ animationDelay: '0.6s' }} />
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
 };
