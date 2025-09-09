@@ -1,0 +1,72 @@
+name: Lint & Auto Fix
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint-fix:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      # 🔹 Buat ESLint config minimal
+      - name: Create ESLint config
+        run: |
+          echo '{
+            "parser": "@typescript-eslint/parser",
+            "plugins": ["@typescript-eslint", "react", "prettier"],
+            "extends": [
+              "eslint:recommended",
+              "plugin:react/recommended",
+              "plugin:@typescript-eslint/recommended",
+              "plugin:prettier/recommended"
+            ],
+            "rules": {
+              "prettier/prettier": "error",
+              "react/react-in-jsx-scope": "off"
+            },
+            "settings": {
+              "react": { "version": "detect" }
+            }
+          }' > .eslintrc.json
+
+      # 🔹 Buat Prettier config minimal
+      - name: Create Prettier config
+        run: |
+          echo '{
+            "semi": true,
+            "singleQuote": false,
+            "trailingComma": "es5",
+            "tabWidth": 2,
+            "printWidth": 80,
+            "arrowParens": "always",
+            "endOfLine": "auto"
+          }' > .prettierrc.json
+
+      - name: Run ESLint Fix
+        run: npx eslint "src/**/*.{ts,tsx,js,jsx}" --fix || true
+
+      - name: Run Prettier Fix
+        run: npx prettier --write "src/**/*.{ts,tsx,js,jsx,json,css,html}"
+
+      - name: Commit & Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: auto-fix code style (eslint + prettier)"
+          commit_user_name: github-actions[bot]
+          commit_user_email: github-actions[bot]@users.noreply.github.com
