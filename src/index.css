@@ -11,19 +11,19 @@
     --cosmic-deep: 240 40% 8%;
     --cosmic-medium: 250 35% 12%;
     --cosmic-light: 260 30% 18%;
-    
+
     /* Galaxy Colors */
     --galaxy-purple: 270 70% 45%;
     --galaxy-blue: 240 80% 55%;
     --galaxy-cyan: 190 85% 60%;
     --galaxy-pink: 320 75% 65%;
     --galaxy-gold: 45 90% 70%;
-    
+
     /* Text Colors */
     --text-cosmic: 240 15% 85%;
     --text-bright: 240 5% 95%;
     --text-muted: 240 10% 65%;
-    
+
     /* UI Colors */
     --background: var(--cosmic-void);
     --foreground: var(--text-bright);
@@ -45,7 +45,7 @@
     --input: var(--cosmic-medium);
     --ring: var(--galaxy-blue);
     --radius: 0.75rem;
-    
+
     /* Sidebar */
     --sidebar-background: var(--cosmic-deep);
     --sidebar-foreground: var(--text-cosmic);
@@ -55,18 +55,35 @@
     --sidebar-accent-foreground: var(--text-cosmic);
     --sidebar-border: var(--cosmic-light);
     --sidebar-ring: var(--galaxy-blue);
-    
+
     /* Gradients */
-    --gradient-cosmic: linear-gradient(135deg, hsl(var(--cosmic-void)), hsl(var(--cosmic-deep)));
-    --gradient-galaxy: linear-gradient(135deg, hsl(var(--galaxy-purple)), hsl(var(--galaxy-blue)));
-    --gradient-nebula: linear-gradient(45deg, hsl(var(--galaxy-pink)), hsl(var(--galaxy-cyan)));
-    --gradient-stellar: linear-gradient(90deg, hsl(var(--galaxy-blue)), hsl(var(--galaxy-purple)), hsl(var(--galaxy-pink)));
-    
+    --gradient-cosmic: linear-gradient(
+      135deg,
+      hsl(var(--cosmic-void)),
+      hsl(var(--cosmic-deep))
+    );
+    --gradient-galaxy: linear-gradient(
+      135deg,
+      hsl(var(--galaxy-purple)),
+      hsl(var(--galaxy-blue))
+    );
+    --gradient-nebula: linear-gradient(
+      45deg,
+      hsl(var(--galaxy-pink)),
+      hsl(var(--galaxy-cyan))
+    );
+    --gradient-stellar: linear-gradient(
+      90deg,
+      hsl(var(--galaxy-blue)),
+      hsl(var(--galaxy-purple)),
+      hsl(var(--galaxy-pink))
+    );
+
     /* Glows */
     --glow-purple: 0 0 30px hsl(var(--galaxy-purple) / 0.5);
     --glow-blue: 0 0 30px hsl(var(--galaxy-blue) / 0.5);
     --glow-cyan: 0 0 30px hsl(var(--galaxy-cyan) / 0.5);
-    
+
     /* Animations */
     --transition-cosmic: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     --transition-stellar: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -97,54 +114,102 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, hsl(var(--galaxy-purple)), hsl(var(--galaxy-blue)));
+    background: linear-gradient(
+      to bottom,
+      hsl(var(--galaxy-purple)),
+      hsl(var(--galaxy-blue))
+    );
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to bottom, hsl(var(--galaxy-blue)), hsl(var(--galaxy-cyan)));
+    background: linear-gradient(
+      to bottom,
+      hsl(var(--galaxy-blue)),
+      hsl(var(--galaxy-cyan))
+    );
   }
 }
 
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes spin-reverse {
-  from { transform: rotate(360deg); }
-  to { transform: rotate(0deg); }
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
 }
 
 @keyframes twinkle {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 @keyframes stellar-rotate {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.1); }
-  100% { transform: rotate(360deg) scale(1); }
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes nebula-flow {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.2) rotate(180deg); }
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 @keyframes bigbang-particle {
-  0% { transform: translateX(0) rotate(0deg); opacity: 1; }
-  100% { transform: translateX(200px) rotate(360deg); opacity: 0; }
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(200px) rotate(360deg);
+    opacity: 0;
+  }
 }
 
 @keyframes meteor-scatter {
@@ -154,11 +219,13 @@
   }
   50% {
     opacity: 0.8;
-    transform: translate(var(--target-x, 0), var(--target-y, 0)) scale(1.2) rotate(180deg);
+    transform: translate(var(--target-x, 0), var(--target-y, 0)) scale(1.2)
+      rotate(180deg);
   }
   100% {
     opacity: 0.6;
-    transform: translate(var(--target-x, 0), var(--target-y, 0)) scale(0.8) rotate(360deg);
+    transform: translate(var(--target-x, 0), var(--target-y, 0)) scale(0.8)
+      rotate(360deg);
   }
 }
 
@@ -178,9 +245,15 @@
 }
 
 @keyframes element-explode {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.5); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes icon-appear {
@@ -195,8 +268,12 @@
 }
 
 @keyframes final-fade {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes welcome-final {
@@ -211,34 +288,73 @@
 }
 
 @keyframes cosmic-form {
-  0% { opacity: 0; transform: scale(0); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes star-birth {
-  0% { opacity: 0; transform: scale(0); }
-  50% { opacity: 1; transform: scale(1.5); }
-  100% { opacity: 0.8; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
 }
 
 @keyframes nebula-birth {
-  0% { opacity: 0; transform: scale(0) rotate(0deg); }
-  100% { opacity: 1; transform: scale(1) rotate(180deg); }
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
 }
 
 @keyframes galaxy-core {
-  0% { opacity: 0; transform: scale(0); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes spiral-arm {
-  0% { opacity: 0; transform: translateX(-50%) rotate(var(--rotation)) scaleY(0); }
-  100% { opacity: 1; transform: translateX(-50%) rotate(var(--rotation)) scaleY(1); }
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) rotate(var(--rotation)) scaleY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) rotate(var(--rotation)) scaleY(1);
+  }
 }
 
 @keyframes welcome-fade {
-  0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .animate-spin-slow {
@@ -279,13 +395,23 @@
   }
 
   .stellar-border {
-    background: linear-gradient(45deg, hsl(var(--galaxy-purple)), hsl(var(--galaxy-blue)), hsl(var(--galaxy-cyan)));
+    background: linear-gradient(
+      45deg,
+      hsl(var(--galaxy-purple)),
+      hsl(var(--galaxy-blue)),
+      hsl(var(--galaxy-cyan))
+    );
     background-size: 200% 200%;
     animation: stellar-gradient 3s ease infinite;
   }
 
   @keyframes stellar-gradient {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
   }
 }

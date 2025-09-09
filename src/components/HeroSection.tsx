@@ -1,21 +1,32 @@
 import { ArrowDown, Sparkles } from "lucide-react";
-import { useScrollAnimation, slideFromBottom, slideFromLeft, slideFromRight } from "@/hooks/useScrollAnimation";
+import {
+  useScrollAnimation,
+  slideFromBottom,
+  slideFromLeft,
+  slideFromRight,
+} from "@/hooks/useScrollAnimation";
 import galaxyHero from "@/assets/galaxy-hero.jpg";
 
 const HeroSection = () => {
-  const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation({ threshold: 0.3 });
-  
+  const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation({
+    threshold: 0.3,
+  });
+
   return (
-    <section ref={heroRef} id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section
+      ref={heroRef}
+      id="home"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+    >
       {/* Background Image with Parallax */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-110 animate-parallax-slow"
         style={{ backgroundImage: `url(${galaxyHero})` }}
       />
-      
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
-      
+
       {/* Floating Particles */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(30)].map((_, i) => (
@@ -36,38 +47,41 @@ const HeroSection = () => {
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
         <div>
           {/* Cosmic Badge */}
-          <div 
+          <div
             className="inline-flex items-center space-x-2 bg-primary/20 backdrop-blur-lg border border-primary/30 rounded-full px-4 py-2 mb-8 animate-pulse-glow"
             style={slideFromBottom(heroVisible, 0)}
           >
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Welcome to My Galaxy</span>
+            <span className="text-sm font-medium text-primary">
+              Welcome to My Galaxy
+            </span>
           </div>
 
-          <h1 
+          <h1
             className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 bg-gradient-to-r from-white via-primary to-accent bg-clip-text text-transparent"
             style={slideFromLeft(heroVisible, 200)}
           >
             RenzMc
           </h1>
-          
+
           <div className="mb-8 space-y-4">
-            <p 
+            <p
               className="text-lg sm:text-xl md:text-2xl text-white/90 font-light max-w-3xl mx-auto"
               style={slideFromRight(heroVisible, 400)}
             >
               Galaxy Creator & Digital Explorer
             </p>
-            <p 
+            <p
               className="text-base md:text-lg text-white/70 max-w-2xl mx-auto leading-relaxed"
               style={slideFromBottom(heroVisible, 600)}
             >
-              Join me on an epic journey through YouTube, TikTok, and beyond as we explore the infinite cosmos of creativity and innovation
+              Join me on an epic journey through YouTube, TikTok, and beyond as
+              we explore the infinite cosmos of creativity and innovation
             </p>
           </div>
 
           {/* CTA Buttons */}
-          <div 
+          <div
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             style={slideFromBottom(heroVisible, 800)}
           >
@@ -103,7 +117,10 @@ const HeroSection = () => {
       {/* Cosmic Rings */}
       <div className="absolute inset-0 pointer-events-none opacity-30">
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-primary/20 rounded-full animate-stellar-rotate" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 border border-accent/20 rounded-full animate-stellar-rotate" style={{ animationDirection: 'reverse', animationDuration: '15s' }} />
+        <div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 border border-accent/20 rounded-full animate-stellar-rotate"
+          style={{ animationDirection: "reverse", animationDuration: "15s" }}
+        />
       </div>
     </section>
   );

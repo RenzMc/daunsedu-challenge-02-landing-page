@@ -16,20 +16,20 @@ const Index = () => {
 
   useEffect(() => {
     setMounted(true);
-    
+
     // Inisialisasi audio dengan preload
     audioRef.current = new Audio(nebulaSound);
     audioRef.current.loop = true;
     audioRef.current.volume = 0.4;
     audioRef.current.preload = "auto";
-    
+
     // Event listener untuk cross-browser compatibility
-    audioRef.current.addEventListener('canplaythrough', () => {
-      console.log('Audio ready to play');
+    audioRef.current.addEventListener("canplaythrough", () => {
+      console.log("Audio ready to play");
     });
 
-    audioRef.current.addEventListener('error', (e) => {
-      console.error('Audio error:', e);
+    audioRef.current.addEventListener("error", (e) => {
+      console.error("Audio error:", e);
     });
 
     return () => {
@@ -46,17 +46,17 @@ const Index = () => {
       try {
         // Reset audio position jika sudah pernah diplay
         audioRef.current.currentTime = 0;
-        
+
         // Play dengan promise handling
         await audioRef.current.play();
         setAudioStarted(true);
-        console.log('Audio started successfully');
-        
+        console.log("Audio started successfully");
+
         // Remove event listeners setelah audio berhasil diplay
         removeUserInteractionListeners();
       } catch (error) {
-        console.error('Failed to play audio:', error);
-        
+        console.error("Failed to play audio:", error);
+
         // Retry mechanism untuk beberapa browser
         setTimeout(() => {
           if (audioRef.current && !audioStarted) {
@@ -75,43 +75,70 @@ const Index = () => {
   // Function untuk add event listeners
   const addUserInteractionListeners = () => {
     // Mouse events
-    document.addEventListener('click', handleUserInteraction, { once: true, passive: true });
-    document.addEventListener('mousedown', handleUserInteraction, { once: true, passive: true });
-    
+    document.addEventListener("click", handleUserInteraction, {
+      once: true,
+      passive: true,
+    });
+    document.addEventListener("mousedown", handleUserInteraction, {
+      once: true,
+      passive: true,
+    });
+
     // Touch events untuk mobile
-    document.addEventListener('touchstart', handleUserInteraction, { once: true, passive: true });
-    document.addEventListener('touchend', handleUserInteraction, { once: true, passive: true });
-    
+    document.addEventListener("touchstart", handleUserInteraction, {
+      once: true,
+      passive: true,
+    });
+    document.addEventListener("touchend", handleUserInteraction, {
+      once: true,
+      passive: true,
+    });
+
     // Scroll events
-    document.addEventListener('scroll', handleUserInteraction, { once: true, passive: true });
-    document.addEventListener('wheel', handleUserInteraction, { once: true, passive: true });
-    
+    document.addEventListener("scroll", handleUserInteraction, {
+      once: true,
+      passive: true,
+    });
+    document.addEventListener("wheel", handleUserInteraction, {
+      once: true,
+      passive: true,
+    });
+
     // Keyboard events
-    document.addEventListener('keydown', handleUserInteraction, { once: true, passive: true });
-    
+    document.addEventListener("keydown", handleUserInteraction, {
+      once: true,
+      passive: true,
+    });
+
     // Mobile specific events
-    window.addEventListener('orientationchange', handleUserInteraction, { once: true, passive: true });
-    
+    window.addEventListener("orientationchange", handleUserInteraction, {
+      once: true,
+      passive: true,
+    });
+
     // Focus events
-    window.addEventListener('focus', handleUserInteraction, { once: true, passive: true });
+    window.addEventListener("focus", handleUserInteraction, {
+      once: true,
+      passive: true,
+    });
   };
 
   // Function untuk remove event listeners
   const removeUserInteractionListeners = () => {
-    document.removeEventListener('click', handleUserInteraction);
-    document.removeEventListener('mousedown', handleUserInteraction);
-    document.removeEventListener('touchstart', handleUserInteraction);
-    document.removeEventListener('touchend', handleUserInteraction);
-    document.removeEventListener('scroll', handleUserInteraction);
-    document.removeEventListener('wheel', handleUserInteraction);
-    document.removeEventListener('keydown', handleUserInteraction);
-    window.removeEventListener('orientationchange', handleUserInteraction);
-    window.removeEventListener('focus', handleUserInteraction);
+    document.removeEventListener("click", handleUserInteraction);
+    document.removeEventListener("mousedown", handleUserInteraction);
+    document.removeEventListener("touchstart", handleUserInteraction);
+    document.removeEventListener("touchend", handleUserInteraction);
+    document.removeEventListener("scroll", handleUserInteraction);
+    document.removeEventListener("wheel", handleUserInteraction);
+    document.removeEventListener("keydown", handleUserInteraction);
+    window.removeEventListener("orientationchange", handleUserInteraction);
+    window.removeEventListener("focus", handleUserInteraction);
   };
 
   const handleIntroComplete = () => {
     setShowIntro(false);
-    
+
     // Add event listeners setelah intro selesai
     setTimeout(() => {
       addUserInteractionListeners();
@@ -137,10 +164,10 @@ const Index = () => {
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [audioStarted]);
 
@@ -215,7 +242,10 @@ const Index = () => {
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-screen h-screen border border-primary/5 rounded-full animate-stellar-rotate" />
             <div
               className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[120vh] border border-accent/5 rounded-full animate-stellar-rotate"
-              style={{ animationDirection: "reverse", animationDuration: "40s" }}
+              style={{
+                animationDirection: "reverse",
+                animationDuration: "40s",
+              }}
             />
             <div
               className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[140vh] border border-primary/3 rounded-full animate-stellar-rotate"

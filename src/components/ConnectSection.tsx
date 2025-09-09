@@ -1,13 +1,28 @@
-import { Youtube, Music, Github, Phone, ExternalLink, MessageCircle } from "lucide-react";
-import { useScrollAnimation, slideFromBottom, slideFromLeft, slideFromRight, scaleIn } from "@/hooks/useScrollAnimation";
+import {
+  Youtube,
+  Music,
+  Github,
+  Phone,
+  ExternalLink,
+  MessageCircle,
+} from "lucide-react";
+import {
+  useScrollAnimation,
+  slideFromBottom,
+  slideFromLeft,
+  slideFromRight,
+  scaleIn,
+} from "@/hooks/useScrollAnimation";
 import galaxyCard1 from "@/assets/galaxy-card-1.png";
 import galaxyCard2 from "@/assets/galaxy-card-2.png";
 import galaxyCard3 from "@/assets/galaxy-card-3.png";
 import galaxyCard4 from "@/assets/galaxy-card-4.png";
 
 const ConnectSection = () => {
-  const { ref: connectRef, isVisible: connectVisible } = useScrollAnimation({ threshold: 0.3 });
-  
+  const { ref: connectRef, isVisible: connectVisible } = useScrollAnimation({
+    threshold: 0.3,
+  });
+
   const socialPlatforms = [
     {
       name: "YouTube",
@@ -16,8 +31,9 @@ const ConnectSection = () => {
       icon: Youtube,
       color: "from-red-500/80 to-red-600/80",
       hoverColor: "hover:shadow-red-500/50",
-      description: "Tech tutorials, behind-the-scenes content, and creative projects",
-      galaxyBg: galaxyCard1
+      description:
+        "Tech tutorials, behind-the-scenes content, and creative projects",
+      galaxyBg: galaxyCard1,
     },
     {
       name: "TikTok",
@@ -27,7 +43,7 @@ const ConnectSection = () => {
       color: "from-pink-500/80 to-pink-600/80",
       hoverColor: "hover:shadow-pink-500/50",
       description: "Quick tips, trending content, and fun tech moments",
-      galaxyBg: galaxyCard2
+      galaxyBg: galaxyCard2,
     },
     {
       name: "GitHub",
@@ -36,8 +52,9 @@ const ConnectSection = () => {
       icon: Github,
       color: "from-purple-500/80 to-purple-600/80",
       hoverColor: "hover:shadow-purple-500/50",
-      description: "Open source projects, code repositories, and collaborations",
-      galaxyBg: galaxyCard3
+      description:
+        "Open source projects, code repositories, and collaborations",
+      galaxyBg: galaxyCard3,
     },
     {
       name: "WhatsApp",
@@ -47,15 +64,19 @@ const ConnectSection = () => {
       color: "from-green-500/80 to-green-600/80",
       hoverColor: "hover:shadow-green-500/50",
       description: "Direct messaging for collaborations and inquiries",
-      galaxyBg: galaxyCard4
-    }
+      galaxyBg: galaxyCard4,
+    },
   ];
 
   return (
-    <section ref={connectRef} id="connect" className="relative py-16 md:py-24 px-4 overflow-hidden">
+    <section
+      ref={connectRef}
+      id="connect"
+      className="relative py-16 md:py-24 px-4 overflow-hidden"
+    >
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-muted/10 via-background to-muted/10" />
-      
+
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden opacity-30">
         {[...Array(25)].map((_, i) => (
@@ -75,17 +96,18 @@ const ConnectSection = () => {
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-12 md:mb-16">
-          <h2 
+          <h2
             className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"
             style={slideFromBottom(connectVisible, 0)}
           >
             Connect Across the Galaxy
           </h2>
-          <p 
+          <p
             className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto"
             style={slideFromBottom(connectVisible, 200)}
           >
-            Join me on different platforms and let's explore the digital universe together
+            Join me on different platforms and let's explore the digital
+            universe together
           </p>
         </div>
 
@@ -103,21 +125,23 @@ const ConnectSection = () => {
                 style={{
                   ...scaleIn(connectVisible, 400 + index * 100),
                   backgroundImage: `url(${platform.galaxyBg})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat'
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
                 }}
               >
                 {/* Dark overlay untuk readability */}
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors duration-300" />
-                
+
                 {/* Gradient overlay untuk efek yang lebih bagus */}
                 <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/60" />
 
                 {/* Platform Header */}
-                <div className={`relative h-24 bg-gradient-to-br ${platform.color} overflow-hidden flex items-center justify-center`}>
+                <div
+                  className={`relative h-24 bg-gradient-to-br ${platform.color} overflow-hidden flex items-center justify-center`}
+                >
                   <IconComponent className="relative z-10 w-8 h-8 text-white group-hover:scale-110 transition-transform duration-300 drop-shadow-lg" />
-                  
+
                   {/* Floating particles */}
                   <div className="absolute inset-0 overflow-hidden">
                     {[...Array(6)].map((_, i) => (
@@ -143,11 +167,11 @@ const ConnectSection = () => {
                     </h3>
                     <ExternalLink className="w-4 h-4 text-white/80 group-hover:text-primary group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300" />
                   </div>
-                  
+
                   <p className="text-sm text-primary font-medium mb-2 drop-shadow-lg">
                     {platform.handle}
                   </p>
-                  
+
                   <p className="text-xs text-white/90 leading-relaxed drop-shadow-lg">
                     {platform.description}
                   </p>
@@ -155,7 +179,9 @@ const ConnectSection = () => {
 
                 {/* Glow effect saat hover */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${platform.color} opacity-20 rounded-2xl`} />
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${platform.color} opacity-20 rounded-2xl`}
+                  />
                 </div>
 
                 {/* Shimmer effect */}
@@ -168,20 +194,23 @@ const ConnectSection = () => {
         </div>
 
         {/* Call to Action */}
-        <div className="text-center" style={slideFromBottom(connectVisible, 1000)}>
-          <div 
+        <div
+          className="text-center"
+          style={slideFromBottom(connectVisible, 1000)}
+        >
+          <div
             className="relative backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-white/20 max-w-2xl mx-auto overflow-hidden"
             style={{
               backgroundImage: `url(${galaxyCard1})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat'
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
             }}
           >
             {/* Dark overlay untuk CTA */}
             <div className="absolute inset-0 bg-black/50" />
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
-            
+
             <div className="relative z-10">
               <div className="flex items-center justify-center space-x-2 mb-4">
                 <MessageCircle className="w-6 h-6 text-primary" />
@@ -190,8 +219,9 @@ const ConnectSection = () => {
                 </h3>
               </div>
               <p className="text-white/90 mb-6 leading-relaxed drop-shadow-lg">
-                Whether you're interested in collaborations, have questions about content creation, 
-                or just want to connect with a fellow digital explorer, I'd love to hear from you!
+                Whether you're interested in collaborations, have questions
+                about content creation, or just want to connect with a fellow
+                digital explorer, I'd love to hear from you!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
@@ -220,7 +250,10 @@ const ConnectSection = () => {
 
       {/* Decorative Elements */}
       <div className="absolute top-32 left-20 w-24 h-24 bg-gradient-to-r from-primary/30 to-transparent rounded-full blur-xl animate-nebula-flow opacity-50" />
-      <div className="absolute bottom-32 right-20 w-32 h-32 bg-gradient-to-r from-accent/20 to-transparent rounded-full blur-xl animate-nebula-flow opacity-50" style={{ animationDelay: '4s' }} />
+      <div
+        className="absolute bottom-32 right-20 w-32 h-32 bg-gradient-to-r from-accent/20 to-transparent rounded-full blur-xl animate-nebula-flow opacity-50"
+        style={{ animationDelay: "4s" }}
+      />
     </section>
   );
 };
